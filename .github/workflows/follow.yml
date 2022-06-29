@@ -8,8 +8,6 @@ jobs:
   follow-user:
     runs-on: ubuntu-20.04
     steps:
-      - name: check-username
-        run: echo "This PR is opened by ${{ github.event.pull_request.user.login }} ."
       - name: Follow user
         uses: ad2ien/follow-contributor-action@v1
         with:
