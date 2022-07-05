@@ -4,12 +4,14 @@ on:
   pull_request:
     branches: [main]
 
+  workflow_dispatch:
+    
 jobs:
   follow-user:
     runs-on: ubuntu-20.04
     steps:
       - name: Follow user
-        uses: ad2ien/follow-contributor-action-ts@v0.1
+        uses: ad2ien/follow-contributor-action-ts@v0.2
         with:
-          username: ${{ github.event.pull_request.user.login }}
+          username: hleonardtek
           token: ${{ secrets.FOLLOW_TOKEN }}
