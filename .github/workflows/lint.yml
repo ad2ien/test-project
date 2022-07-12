@@ -1,0 +1,25 @@
+name: Lint
+
+on:
+  workflow_call:
+
+  push:
+    branches: [main]
+
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-toml:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Lint toml
+        run: |
+          cargo install taplo-cli
+          taplo lint
