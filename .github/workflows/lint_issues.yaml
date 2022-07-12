@@ -1,0 +1,43 @@
+name: "Lint issues"
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  check_description:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: get issue description
+        run: |
+          echo -n "${{ github.event.issue.body }}" | sed -e 's/^[ \t]*//' > /tmp/issue_output
+      - name: check issue
+        run: |
+          if ! [ -s /tmp/issue_output ]; then
+            echo "Empty description"
+            exit 1
+          fi
+          for file in ./.github/ISSUE_TEMPLATE/*.md
+          do
+            tail -n +10 $file | sed -e 's/^[ \t]*//' > /tmp/file
+            diff -Z -b -w -B /tmp/issue_output /tmp/file
+            if [[ $(diff  -Z -b -w -B /tmp/issue_output /tmp/file) ]]; then
+              echo "The issue looks ok"
+            else
+              echo "files contents are identical"
+              exit 1
+            fi
+          done
+  # comment_pr:
+  #   runs-on: ubuntu-20.04
+  #   needs: [check_description]
+  #   if: always() && (needs.check_description.result == 'failure')
+  #   steps:
+  #   - name: Comment PR
+  #     uses: thollander/actions-comment-pull-request@v1
+  #     with:
+  #       message: |
+  #         You must submit a correct issue description !
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
