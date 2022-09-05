@@ -1,0 +1,17 @@
+name: Cleanup Registry
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: smartsquaregmbh/delete-old-packages@v0.5.0
+        with:
+          token: ${{ secrets.REGISTRY_TOKEN }}
+          user: ad2ien
+          keep: 1
+          type: container
+          names: |
+            test-project
