@@ -2,7 +2,11 @@ name: Cleanup Registry
 
 on:
   workflow_dispatch:
-
+    inputs:
+      names:
+        description: "packages to process"
+        required: true
+        type: string
 jobs:
   cleanup:
     runs-on: ubuntu-20.04
@@ -14,4 +18,5 @@ jobs:
           keep: 1
           type: container
           names: |
-            test-project
+            ${{ inputs.names }}
+
