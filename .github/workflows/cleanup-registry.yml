@@ -2,24 +2,36 @@ name: Cleanup Registry
 
 on:
   workflow_dispatch:
-    inputs:
-      names:
-        description: "packages to process"
-        required: true
-        type: string
 jobs:
-  cleanup:
+  cleanup-ghcr:
     runs-on: ubuntu-20.04
+    env:
+      GH_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
     steps:
-      # - name: Get Repo List
-      #   id: repo
-      #   uses: yi-Xu-0100/repo-list-generator@v1.0.1
-      - uses: smartsquaregmbh/delete-old-packages@v0.5.0
-        with:
-          token: ${{ secrets.REGISTRY_TOKEN }}
-          user: ad2ien
-          keep: 1
-          type: container
-            # ${{steps.repo.outputs.repoList}}
-          names: |
-            ${{ inputs.names }}
+      - name: Retrieve packages
+        id: get_packages
+        run: |
+          OUTPUT="$(gh api \
+          -H "Accept: application/vnd.github+json" \
+          "/users/ad2ien/packages?package_type=container" \
+          -q '.[] | .name')"
+          echo $OUTPUT
+          echo "::set-output name=PACKAGES::$OUTPUT"
+      - name: Cleanup ghcr.io
+        run: |
+          echo "previous result ${{ steps.get_packages.outputs.PACKAGES }}"
+  # cleanup:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     # - name: Get Repo List
+  #     #   id: repo
+  #     #   uses: yi-Xu-0100/repo-list-generator@v1.0.1
+  #     - uses: smartsquaregmbh/delete-old-packages@v0.5.0
+  #       with:
+  #         token: ${{ secrets.REGISTRY_TOKEN }}
+  #         user: ad2ien
+  #         keep: 1
+  #         type: container
+  #           # ${{steps.repo.outputs.repoList}}
+  #         names: |
+  #           ${{ inputs.names }}
