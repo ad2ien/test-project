@@ -8,18 +8,42 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
     steps:
+      # - name: Retrieve packages
+      #   id: get_packages
+      #   run: |
+      #     echo "Retrieve packages"
+      #     PACKAGES=$(curl -s \
+      #     -H "Accept: application/vnd.github.v3+json" \
+      #     -H "Authorization: Bearer $GH_TOKEN" \
+      #     https://api.github.com/users/hleonardtek/packages?package_type=container \
+      #     | jq '[.[] | .name]')
+      #     echo $PACKAGES
+      #     PACKAGES2=${{ toJSON($PACKAGES) }}
+      #     echo "::set-output name=packages::$PACKAGES2"
       - name: Retrieve packages
         id: get_packages
         run: |
-          OUTPUT="$(gh api \
+          PACKAGES=$(gh api \
           -H "Accept: application/vnd.github+json" \
-          "/users/ad2ien/packages?package_type=container" \
-          -q '.[] | .name')"
-          echo $OUTPUT
-          echo "::set-output name=PACKAGES::$OUTPUT"
-      - name: Cleanup ghcr.io
+          -H "Authorization: Bearer $GH_TOKEN" \
+          "/users/hleonardtek/packages?package_type=container" \
+          -q '[.[] | .name]')
+          echo $PACKAGES
+          echo "::set-output name=packages::$PACKAGES"
+      - name: Print packages
         run: |
-          echo "previous result ${{ steps.get_packages.outputs.PACKAGES }}"
+          echo "Display output"
+          echo ${{ steps.get_packages.outputs.packages }}
+      # - name: Cleanup ghcr.io
+      #   uses: smartsquaregmbh/delete-old-packages@v0.5.0
+      #   with:
+      #     token: ${{ secrets.GH_TOKEN }}
+      #     user: hleonardtek
+      #     type: container
+      #     keep: 1
+      #     # version-pattern: "^(pr|feat|fix|chore|ci|style|docs|refactor)-.*$"
+      #     names: |
+      #       ${{ steps.get_packages.outputs.packages }}
   # cleanup:
   #   runs-on: ubuntu-20.04
   #   steps:
