@@ -1,0 +1,23 @@
+name: Test GITHUB_OUTPUT
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test-set-var:
+    runs-on: ubuntu-22.04
+    outputs:
+      date-stamp: ${{ steps.do_set.outputs.date_stamp }}
+    steps:
+      - name: do set
+        id: do_set
+        run: |
+          echo "date_stamp=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+
+  test-get-var:
+    runs-on: ubuntu-22.04
+    needs: test-set-var
+    steps:
+      - name: do get
+        run: echo date from previous job ${{ needs.test-set-var.outputs.date-stamp }}
